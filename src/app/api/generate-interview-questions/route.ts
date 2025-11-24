@@ -1,4 +1,5 @@
-import { OpenAI } from "openai";
+// src/app/api/generate-interview-questions/route.ts
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import {
   SYSTEM_PROMPT,
@@ -8,48 +9,73 @@ import { logger } from "@/lib/logger";
 
 export const maxDuration = 60;
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   logger.info("generate-interview-questions request received");
+
   const body = await req.json();
 
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    maxRetries: 5,
-    dangerouslyAllowBrowser: true,
-  });
+  if (!process.env.GEMINI_API_KEY) {
+    logger.error("GEMINI_API_KEY is not set");
+
+    return NextResponse.json(
+      { error: "GEMINI_API_KEY is not configured" },
+      { status: 500 },
+    );
+  }
+
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
   try {
-    const baseCompletion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT,
-        },
-        {
-          role: "user",
-          content: generateQuestionsPrompt(body),
-        },
-      ],
-      response_format: { type: "json_object" },
+    const userPrompt = generateQuestionsPrompt(body);
+    const fullPrompt = `${SYSTEM_PROMPT}\n\n${userPrompt}\n\nPlease respond with valid JSON only.`;
+
+    // 🔴 IMPORTANT: keep model name compatible with your SDK
+    // If you still see v1beta in the error URL, prefer "gemini-1.5-flash"
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash", // or "gemini-2.0-flash" if your SDK supports v1
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
     });
 
-    const basePromptOutput = baseCompletion.choices[0] || {};
-    const content = basePromptOutput.message?.content;
+    // JSON mode: no extra text, we get JSON straight back
+    const result = await model.generateContent(fullPrompt);
+    const content = result.response.text();
+
+    // Validate JSON once before returning
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (parseError) {
+      logger.error("Invalid JSON response from Gemini:", content);
+
+      return NextResponse.json(
+        { error: "Invalid response format from AI" },
+        { status: 500 },
+      );
+    }
 
     logger.info("Interview questions generated successfully");
 
     return NextResponse.json(
       {
-        response: content,
+        // make frontend usage easy: already parsed
+        response: parsed,
       },
       { status: 200 },
     );
-  } catch (error) {
-    logger.error("Error generating interview questions");
+  } catch (error: any) {
+    logger.error(
+      "Error generating interview questions:",
+      error?.message || error,
+    );
 
     return NextResponse.json(
-      { error: "internal server error" },
+      {
+        error: error?.message || "internal server error",
+        details:
+          process.env.NODE_ENV === "development" ? error?.stack : undefined,
+      },
       { status: 500 },
     );
   }

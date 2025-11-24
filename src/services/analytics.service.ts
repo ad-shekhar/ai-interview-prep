@@ -1,6 +1,6 @@
 "use server";
 
-import { OpenAI } from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ResponseService } from "@/services/responses.service";
 import { InterviewService } from "@/services/interviews.service";
 import { Question } from "@/types/interview";
@@ -31,35 +31,25 @@ export const generateInterviewAnalytics = async (payload: {
       .map((q: Question, index: number) => `${index + 1}. ${q.question}`)
       .join("\n");
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-      maxRetries: 5,
-      dangerouslyAllowBrowser: true,
-    });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
     const prompt = getInterviewAnalyticsPrompt(
       interviewTranscript,
       mainInterviewQuestions,
     );
 
-    const baseCompletion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: SYSTEM_PROMPT,
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      response_format: { type: "json_object" },
+    const fullPrompt = `${SYSTEM_PROMPT}\n\n${prompt}\n\nPlease respond with valid JSON only.`;
+
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
     });
 
-    const basePromptOutput = baseCompletion.choices[0] || {};
-    const content = basePromptOutput.message?.content || "";
-    const analyticsResponse = JSON.parse(content);
+    const result = await model.generateContent(fullPrompt);
+    const response_text = result.response.text();
+    const analyticsResponse = JSON.parse(response_text);
 
     analyticsResponse.mainInterviewQuestions = questions.map(
       (q: Question) => q.question,
@@ -67,7 +57,7 @@ export const generateInterviewAnalytics = async (payload: {
 
     return { analytics: analyticsResponse, status: 200 };
   } catch (error) {
-    console.error("Error in OpenAI request:", error);
+    console.error("Error in Gemini request:", error);
 
     return { error: "internal server error", status: 500 };
   }

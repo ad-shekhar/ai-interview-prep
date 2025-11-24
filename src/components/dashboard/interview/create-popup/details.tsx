@@ -85,9 +85,12 @@ function DetailsPopup({
       data,
     )) as any;
 
-    const generatedQuestionsResponse = JSON.parse(
-      generatedQuestions?.data?.response,
-    );
+    let generatedQuestionsResponse = generatedQuestions?.data?.response;
+
+    if (typeof generatedQuestionsResponse === "string") {
+      generatedQuestionsResponse = JSON.parse(generatedQuestionsResponse);
+    }
+
 
     const updatedQuestions = generatedQuestionsResponse.questions.map(
       (question: Question) => ({

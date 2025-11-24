@@ -1,12 +1,12 @@
-[![GitHub stars](https://img.shields.io/github/stars/FoloUp/FoloUp?style=social)](https://github.com/FoloUp/FoloUp/stargazers)
-![License](https://img.shields.io/github/license/foloup/foloup)
+[![GitHub stars](https://img.shields.io/github/stars/IPP/IPP?style=social)](https://github.com/IPP/IPP/stargazers)
+![License](https://img.shields.io/github/license/IPP/IPP)
 [![Twitter Follow](https://img.shields.io/twitter/follow/SuveenE?style=social)](https://x.com/SuveenE)
 
-# FoloUp - AI-powered voice interviewer for hiring 💼
+# IPP - AI-powered voice interviewer for hiring 💼
 
-FoloUp is an open source platform for companies to conduct AI powered hiring interviews with their candidates.
+IPP is an open source platform for companies to conduct AI powered hiring interviews with their candidates.
 
-<img src="https://github.com/user-attachments/assets/fa92ade1-02ea-4332-b5ed-97056dea01c3" alt="FoloUp Logo" width="800">
+<img src="https://github.com/user-attachments/assets/fa92ade1-02ea-4332-b5ed-97056dea01c3" alt="IPP Logo" width="800">
 
 <div style="display: flex; flex-direction: row; gap: 20px; margin: 20px 0;">
   <picture>
@@ -32,7 +32,7 @@ Here's a [loom](https://www.loom.com/share/762fd7d12001490bbfdcf3fac37ff173?sid=
 1. Clone the project.
 
 ```bash
-git clone https://github.com/FoloUp/FoloUp.git
+git clone https://github.com/IPP/IPP.git
 ```
 
 2. Copy the existing environment template file
@@ -104,15 +104,15 @@ We recommend using [Vercel](https://vercel.com/) to host the app.
 
 ## Contributing
 
-If you'd like to contribute to FoloUp, feel free to fork the repository, make your changes, and submit a pull request. Contributions are welcomed and appreciated.
+If you'd like to contribute to IPP, feel free to fork the repository, make your changes, and submit a pull request. Contributions are welcomed and appreciated.
 
 For a detailed guide on contributing, read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
 ## Show Your Support 🌟
 
-If you find FoloUp helpful, please consider giving us a star on GitHub! It helps us reach more developers and continue improving the project.
+If you find IPP helpful, please consider giving us a star on GitHub! It helps us reach more developers and continue improving the project.
 
-## Products built on top of FoloUp 🚀
+## Products built on top of IPP 🚀
 
 <div style="display: flex; flex-direction: row; gap: 40px; align-items: center;">
   <a href="https://talvin.ai/" target="_blank" style="text-align: center; text-decoration: none;">
